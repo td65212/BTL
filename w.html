@@ -1,0 +1,2771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNU Q&A Hub - Diễn đàn Hỏi Đáp Sinh viên DNU</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+         .comment-item {
+        padding: 0.5rem;
+        margin-left: 1rem;
+        border-left: 2px solid #e5e7eb;
+        margin-bottom: 0.5rem;
+        background-color: #f9fafb;
+        border-radius: 0.25rem;
+    }
+
+    .comment-item:hover {
+        background-color: #f3f4f6;
+    }
+
+    .delete-comment {
+        font-size: 0.75rem;
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.2rem;
+    }
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+        .markdown-content ul {
+            list-style-type: disc;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .markdown-content ol {
+            list-style-type: decimal;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .markdown-content pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+        .markdown-content code {
+            background-color: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        .editor-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .editor-toolbar button {
+            padding: 0.25rem 0.5rem;
+            background-color: #e5e7eb;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .editor-toolbar button:hover {
+            background-color: #d1d5db;
+        }
+        .answer-item {
+            transition: all 0.3s ease;
+        }
+        .answer-item:hover {
+            background-color: #f8fafc;
+        }
+        .comment-item {
+            padding: 0.5rem;
+            margin-left: 1rem;
+            border-left: 2px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header/Navbar -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="#" class="flex items-center">
+                    <i class="fas fa-graduation-cap text-2xl"></i>
+                    <span class="ml-2 text-xl font-bold">DNU Q&A Hub</span>
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:underline">Trang chủ</a>
+                    <a href="#" class="hover:underline">Câu hỏi</a>
+                    <a href="#" class="hover:underline">Thẻ</a>
+                    <a href="#" class="hover:underline">Người dùng</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4" id="authButtonsContainer">
+                <div class="flex items-center space-x-2" id="authButtons">
+                    <button id="loginBtn" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 rounded-md">Đăng nhập</button>
+                    <button id="registerBtn" class="px-4 py-2 bg-white text-blue-600 hover:bg-gray-100 rounded-md">Đăng ký</button>
+                    <button id="adminBtn" class="hidden px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Admin</button>
+                </div>
+                <div id="userNav" class="hidden flex items-center space-x-2 cursor-pointer">
+                </div>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-blue-700 px-4 py-2">
+            <div class="flex flex-col space-y-3">
+                <a href="#" class="hover:underline">Trang chủ</a>
+                <a href="#" class="hover:underline">Câu hỏi</a>
+                <a href="#" class="hover:underline">Thẻ</a>
+                <a href="#" class="hover:underline">Người dùng</a>
+                <div class="relative">
+                    <input type="text" placeholder="Tìm kiếm..." class="px-4 py-2 rounded-full text-gray-800 w-full focus:outline-none">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Left sidebar -->
+            <aside class="w-full lg:w-1/4 order-2 lg:order-1">
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                    <h3 class="font-bold text-lg mb-3">Bộ lọc</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sắp xếp theo</label>
+                            <select class="w-full p-2 border rounded-md">
+                                <option>Mới nhất</option>
+                                <option>Bình chọn cao</option>
+                                <option>Lượt xem nhiều</option>
+                                <option>Nhiều câu trả lời</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                            <select class="w-full p-2 border rounded-md">
+                                <option>Tất cả</option>
+                                <option>Hôm nay</option>
+                                <option>Tuần này</option>
+                                <option>Tháng này</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Thẻ phổ biến</label>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">FIT4016</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">CSharp</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Database</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">OOP</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">TuyenSinh</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <h3 class="font-bold text-lg mb-3">Thống kê</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Tổng câu hỏi:</span>
+                            <span class="font-bold">1,245</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Tổng câu trả lời:</span>
+                            <span class="font-bold">3,567</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Người dùng:</span>
+                            <span class="font-bold">892</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Thẻ:</span>
+                            <span class="font-bold">56</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Main content area -->
+            <div class="w-full lg:w-2/4 order-1 lg:order-2">
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Câu hỏi mới nhất</h2>
+                        <button id="askQuestionBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <i class="fas fa-plus mr-1"></i> Đặt câu hỏi
+                        </button>
+                    </div>
+                    
+                    <!-- Question list -->
+                    <div class="space-y-4" id="questionsList">
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="flex justify-center mt-6">
+                        <nav class="inline-flex rounded-md shadow">
+                            <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-blue-600 font-medium">1</a>
+                            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">2</a>
+                            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">3</a>
+                            <a href="#" class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 rounded-r-md">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right sidebar -->
+            <aside class="w-full lg:w-1/4 order-3">
+                <!-- Account Management -->
+                <div id="accountManagement" class="bg-white rounded-lg shadow-md p-4 mb-4" style="display: none;">
+                    <h3 class="font-bold text-lg mb-3">Quản lý tài khoản</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mr-3">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">NguyenVanA</div>
+                                <div class="text-xs text-gray-500">1,245 điểm</div>
+                            </div>
+                        </div>
+                        <div class="border-t pt-3 space-y-2">
+                            <a href="#" class="flex items-center text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-user-edit mr-2 w-5"></i>
+                                <span>Hồ sơ cá nhân</span>
+                            </a>
+                            <a href="#" class="flex items-center text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-question-circle mr-2 w-5"></i>
+                                <span>Câu hỏi của tôi</span>
+                            </a>
+                            <a href="#" class="flex items-center text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-comment-alt mr-2 w-5"></i>
+                                <span>Câu trả lời của tôi</span>
+                            </a>
+                            <a href="#" class="flex items-center text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-bookmark mr-2 w-5"></i>
+                                <span>Đã lưu</span>
+                            </a>
+                            <a href="#" class="flex items-center text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-cog mr-2 w-5"></i>
+                                <span>Cài đặt</span>
+                            </a>
+                            <button id="logoutBtn" class="flex items-center text-red-600 hover:text-red-800 w-full">
+                                <i class="fas fa-sign-out-alt mr-2 w-5"></i>
+                                <span>Đăng xuất</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                    <h3 class="font-bold text-lg mb-3">Top người dùng</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mr-2">1</div>
+                            <div class="flex-1">
+                                <a href="#" class="text-blue-600 hover:underline user-link">NguyenVanA</a>
+                                <div class="text-xs text-gray-500">1,245 điểm</div>
+                            </div>
+                            <div class="text-sm font-bold text-green-600">+24</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center mr-2">2</div>
+                            <div class="flex-1">
+                                <a href="#" class="text-blue-600 hover:underline user-link">TranThiB</a>
+                                <div class="text-xs text-gray-500">987 điểm</div>
+                            </div>
+                            <div class="text-sm font-bold text-green-600">+15</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <h3 class="font-bold text-lg mb-3">Thông báo</h3>
+                    <div class="space-y-3">
+                        <div class="text-sm">
+                            <div class="font-medium">Hệ thống đã cập nhật phiên bản mới</div>
+                            <div class="text-gray-500 text-xs">2 giờ trước</div>
+                        </div>
+                        <div class="text-sm">
+                            <div class="font-medium">Bạn có 2 câu trả lời mới cho câu hỏi của bạn</div>
+                            <div class="text-gray-500 text-xs">5 giờ trước</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Đăng nhập</h3>
+                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập email của bạn">
+                    </div>
+                    <div class="mb-4">
+                        <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                        <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập mật khẩu">
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="rememberMe" class="ml-2 block text-sm text-gray-700">Ghi nhớ đăng nhập</label>
+                        </div>
+                        <a href="#" class="text-sm text-blue-600 hover:underline">Quên mật khẩu?</a>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Đăng nhập
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600">Chưa có tài khoản? <a href="#" id="switchToRegister" class="text-blue-600 hover:underline">Đăng ký ngay</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Đăng ký tài khoản</h3>
+                <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                        <input type="text" id="registerName" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập họ tên đầy đủ">
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="registerEmail" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập email của bạn">
+                        <p class="mt-1 text-xs text-gray-500">Vui lòng sử dụng email trường (@daihocdainam.edu.vn)</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                        <input type="password" id="registerPassword" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập mật khẩu">
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerConfirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu</label>
+                        <input type="password" id="registerConfirmPassword" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập lại mật khẩu">
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="agreeTerms" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="agreeTerms" class="ml-2 block text-sm text-gray-700">Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản sử dụng</a></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Đăng ký
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600">Đã có tài khoản? <a href="#" id="switchToLogin" class="text-blue-600 hover:underline">Đăng nhập ngay</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ask Question Modal -->
+    <div id="askQuestionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Đặt câu hỏi mới</h3>
+                <button id="closeAskQuestionModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="askQuestionForm">
+                    <div class="mb-6">
+                        <label for="questionTitle" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề câu hỏi</label>
+                        <input type="text" id="questionTitle" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: Làm thế nào để implement Dependency Injection trong ASP.NET Core?">
+                        <p class="mt-1 text-xs text-gray-500">Hãy đặt tiêu đề rõ ràng và cụ thể</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="questionContent" class="block text-sm font-medium text-gray-700 mb-1">Nội dung chi tiết</label>
+                        <div class="editor-toolbar">
+                            <button type="button" title="Bold"><i class="fas fa-bold"></i></button>
+                            <button type="button" title="Italic"><i class="fas fa-italic"></i></button>
+                            <button type="button" title="Heading"><i class="fas fa-heading"></i></button>
+                            <button type="button" title="Quote"><i class="fas fa-quote-right"></i></button>
+                            <button type="button" title="Code"><i class="fas fa-code"></i></button>
+                            <button type="button" title="Link"><i class="fas fa-link"></i></button>
+                            <button type="button" title="Image"><i class="fas fa-image"></i></button>
+                            <button type="button" title="List"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                        </div>
+                        <textarea id="questionContent" rows="10" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mô tả chi tiết vấn đề của bạn..."></textarea>
+                        <p class="mt-1 text-xs text-gray-500">Hỗ trợ định dạng Markdown cơ bản</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Thẻ (Tags)</label>
+                        <div class="flex flex-wrap gap-2 mb-2" id="selectedTags">
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="tagInput" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập thẻ liên quan (ví dụ: CSharp, ASP.NET)">
+                            <div id="tagSuggestions" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden">
+                            </div>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Chọn ít nhất 1 thẻ, tối đa 5 thẻ. Thẻ giúp câu hỏi của bạn được tìm thấy dễ dàng hơn.</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancelQuestion" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Hủy bỏ
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Đăng câu hỏi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Detail Modal -->
+    <div id="questionDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Chi tiết câu hỏi</h3>
+                <button id="closeQuestionDetailModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <!-- Question Section -->
+                <div class="mb-8">
+                    <div class="flex items-start">
+                        <div class="w-16 flex flex-col items-center text-center pr-4">
+                            <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="question" data-id="1" data-vote="up">
+                                <i class="fas fa-chevron-up text-xl"></i>
+                            </button>
+                            <span class="font-bold text-lg my-1" id="questionVotes">24</span>
+                            <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="question" data-id="1" data-vote="down">
+                                <i class="fas fa-chevron-down text-xl"></i>
+                            </button>
+                            <button class="mt-2 text-gray-500 hover:text-green-600 bookmark-btn" title="Lưu câu hỏi">
+                                <i class="far fa-bookmark text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="flex-1">
+                            <h1 class="text-2xl font-bold mb-4" id="questionDetailTitle">Làm thế nào để implement Dependency Injection trong ASP.NET Core?</h1>
+                            <div class="markdown-content bg-gray-50 p-4 rounded-lg mb-4" id="questionDetailContent">
+                                <p>Mình đang học ASP.NET Core và gặp khó khăn với Dependency Injection. Ai có thể giải thích cách implement nó với ví dụ cụ thể không? Mình đã thử theo tài liệu Microsoft nhưng vẫn chưa hiểu rõ cách áp dụng vào dự án thực tế.</p>
+                                <p>Cụ thể mình muốn hỏi về:</p>
+                                <ul>
+                                    <li>Cách đăng ký service</li>
+                                    <li>Cách inject vào controller</li>
+                                    <li>Lifecycle của DI trong ASP.NET Core</li>
+                                </ul>
+                            </div>
+                            <div class="flex flex-wrap justify-between items-center">
+                                <div class="flex flex-wrap gap-2 mb-2" id="questionDetailTags">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">CSharp</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">ASP.NET</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Dependency-Injection</span>
+                                </div>
+                                <div class="text-xs text-gray-500" id="questionDetailMeta">
+                                    <div class="flex items-center">
+                                        <span>Đăng bởi <a href="#" class="text-blue-600 hover:underline user-link">NguyenVanA</a></span>
+                                        <span class="mx-1">•</span>
+                                        <span>2 giờ trước</span>
+                                        <span class="mx-1">•</span>
+                                        <span>5 câu trả lời</span>
+                                        <span class="mx-1">•</span>
+                                        <span>24 lượt xem</span>
+                                    </div>
+                                    <div class="mt-1">
+                                        <button class="text-blue-600 hover:underline mr-3 edit-question">Chỉnh sửa</button>
+                                        <button class="text-blue-600 hover:underline">Báo cáo</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comment Section for Question -->
+                    <div class="mt-4 pl-16">
+                        <h4 class="font-bold mb-2">Bình luận</h4>
+                        <div id="questionComments">
+                            <!-- Comments will be loaded here -->
+                        </div>
+                        <form id="questionCommentForm" class="mt-2">
+                            <textarea class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Thêm bình luận..."></textarea>
+                            <button type="submit" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">Gửi bình luận</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Answers Section -->
+                <div class="border-t pt-6">
+                    <h3 class="text-xl font-bold mb-4">5 Câu trả lời</h3>
+                    
+                    <!-- Answer 1 (Accepted) -->
+                    <div class="border-b pb-6 mb-6 bg-green-50 p-4 rounded-lg answer-item" data-author-id="2">
+                        <div class="flex items-start">
+                            <div class="w-16 flex flex-col items-center text-center pr-4">
+                                <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="answer" data-id="1" data-vote="up">
+                                    <i class="fas fa-chevron-up text-xl"></i>
+                                </button>
+                                <span class="font-bold text-lg my-1">15</span>
+                                <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="answer" data-id="1" data-vote="down">
+                                    <i class="fas fa-chevron-down text-xl"></i>
+                                </button>
+                                <div class="mt-2 text-green-600">
+                                    <i class="fas fa-check-circle text-xl" title="Câu trả lời được chấp nhận"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="markdown-content bg-white p-4 rounded-lg mb-3">
+                                    <p>Trong ASP.NET Core, Dependency Injection (DI) được tích hợp sẵn. Dưới đây là cách triển khai cơ bản:</p>
+                                    <ol>
+                                        <li><strong>Đăng ký service</strong> trong <code>Program.cs</code> hoặc <code>Startup.cs</code>:</li>
+                                    </ol>
+                                    <pre><code>builder.Services.AddScoped&lt;IMyService, MyService&gt;();</code></pre>
+                                    <p>Có 3 loại lifecycle:</p>
+                                    <ul>
+                                        <li><code>AddTransient</code>: Tạo mới mỗi lần request</li>
+                                        <li><code>AddScoped</code>: Tạo mới mỗi scope (thường là mỗi request)</li>
+                                        <li><code>AddSingleton</code>: Chỉ tạo một instance duy nhất</li>
+                                    </ul>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-xs text-gray-500">
+                                        <span>Trả lời bởi <a href="#" class="text-blue-600 hover:underline user-link">TranThiB</a></span>
+                                        <span class="mx-1">•</span>
+                                        <span>1 giờ trước</span>
+                                    </div>
+                                    <div>
+                                        <button class="text-blue-600 hover:underline mr-3">Chỉnh sửa</button>
+                                        <button class="text-blue-600 hover:underline">Báo cáo</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comment Section for Answer -->
+                                <div class="mt-4">
+                                    <h5 class="font-bold mb-2">Bình luận</h5>
+                                    <div class="answer-comments" data-answer-id="1">
+                                        <!-- Comments will be loaded here -->
+                                    </div>
+                                    <form class="answer-comment-form mt-2" data-answer-id="1">
+                                        <textarea class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Thêm bình luận..."></textarea>
+                                        <button type="submit" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">Gửi bình luận</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Answer 2 -->
+                    <div class="border-b pb-6 mb-6 answer-item" data-author-id="3">
+                        <div class="flex items-start">
+                            <div class="w-16 flex flex-col items-center text-center pr-4">
+                                <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="answer" data-id="2" data-vote="up">
+                                    <i class="fas fa-chevron-up text-xl"></i>
+                                </button>
+                                <span class="font-bold text-lg my-1">8</span>
+                                <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="answer" data-id="2" data-vote="down">
+                                    <i class="fas fa-chevron-down text-xl"></i>
+                                </button>
+                                <button class="mt-2 text-gray-500 hover:text-green-600 accept-btn" data-answer-id="2" data-question-id="1" title="Chấp nhận câu trả lời">
+                                    <i class="far fa-check-circle text-xl"></i>
+                                </button>
+                            </div>
+                            <div class="flex-1">
+                                <div class="markdown-content bg-white p-4 rounded-lg mb-3">
+                                    <p>Bạn có thể inject service vào controller qua constructor:</p>
+                                    <pre><code>public class MyController : Controller
+{
+    private readonly IMyService _myService;
+    
+    public MyController(IMyService myService)
+    {
+        _myService = myService;
+    }
+    
+    public IActionResult Index()
+    {
+        var data = _myService.GetData();
+        return View(data);
+    }
+}</code></pre>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-xs text-gray-500">
+                                        <span>Trả lời bởi <a href="#" class="text-blue-600 hover:underline user-link">LeVanC</a></span>
+                                        <span class="mx-1">•</span>
+                                        <span>30 phút trước</span>
+                                    </div>
+                                    <div>
+                                        <button class="text-blue-600 hover:underline mr-3">Chỉnh sửa</button>
+                                        <button class="text-blue-600 hover:underline">Báo cáo</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comment Section for Answer -->
+                                <div class="mt-4">
+                                    <h5 class="font-bold mb-2">Bình luận</h5>
+                                    <div class="answer-comments" data-answer-id="2">
+                                        <!-- Comments will be loaded here -->
+                                    </div>
+                                    <form class="answer-comment-form mt-2" data-answer-id="2">
+                                        <textarea class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Thêm bình luận..."></textarea>
+                                        <button type="submit" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">Gửi bình luận</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Your Answer Section -->
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold mb-4">Câu trả lời của bạn</h3>
+                        <form id="answerForm">
+                            <div class="editor-toolbar">
+                                <button type="button" title="Bold"><i class="fas fa-bold"></i></button>
+                                <button type="button" title="Italic"><i class="fas fa-italic"></i></button>
+                                <button type="button" title="Code"><i class="fas fa-code"></i></button>
+                                <button type="button" title="Link"><i class="fas fa-link"></i></button>
+                                <button type="button" title="Image"><i class="fas fa-image"></i></button>
+                                <button type="button" title="List"><i class="fas fa-list-ul"></i></button>
+                            </div>
+                            <textarea id="answerContent" rows="8" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập câu trả lời của bạn..."></textarea>
+                            <div class="mt-4 flex justify-end">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                    Đăng câu trả lời
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Modal -->
+    <div id="adminDashboardModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Bảng điều khiển Quản trị viên</h3>
+                <button id="closeAdminDashboardModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Tab navigation -->
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button id="adminUsersTab" class="mr-8 py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600">
+                        Người dùng
+                    </button>
+                    <button id="adminTagsTab" class="mr-8 py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Thẻ (Tags)
+                    </button>
+                    <button id="adminContentTab" class="mr-8 py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Nội dung
+                    </button>
+                    <button id="adminReportsTab" class="mr-8 py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Báo cáo
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Users Management -->
+            <div id="adminUsersContent" class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-lg">Danh sách người dùng</h4>
+                    <div class="flex space-x-2">
+                        <input type="text" placeholder="Tìm kiếm người dùng..." class="px-3 py-1 border rounded-md">
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded-md">Tìm kiếm</button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Điểm</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vai trò</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <a href="#" class="text-blue-600 hover:underline">Nguyen Van A</a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">a.nguyen@daihocdainam.edu.vn</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1245</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <select class="text-sm border rounded px-2 py-1">
+                                        <option selected>User</option>
+                                        <option>Moderator</option>
+                                        <option>Admin</option>
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900 mr-3">Sửa</button>
+                                    <button class="text-red-600 hover:text-red-900">Khóa</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <a href="#" class="text-blue-600 hover:underline">Tran Thi B</a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">b.tran@daihocdainam.edu.vn</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">987</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <select class="text-sm border rounded px-2 py-1">
+                                        <option>User</option>
+                                        <option selected>Moderator</option>
+                                        <option>Admin</option>
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900 mr-3">Sửa</button>
+                                    <button class="text-red-600 hover:text-red-900">Khóa</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex justify-between items-center mt-4">
+                    <div class="text-sm text-gray-500">
+                        Hiển thị 1 đến 10 của 50 người dùng
+                    </div>
+                    <nav class="inline-flex rounded-md shadow">
+                        <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-blue-600 font-medium">1</a>
+                        <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">2</a>
+                        <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">3</a>
+                        <a href="#" class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 rounded-r-md">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Tags Management -->
+            <div id="adminTagsContent" class="p-6" style="display: none;">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-lg">Quản lý Thẻ (Tags)</h4>
+                    <div class="flex space-x-2">
+                        <input type="text" id="adminTagSearch" placeholder="Tìm kiếm thẻ..." class="px-3 py-1 border rounded-md">
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded-md">Tìm kiếm</button>
+                    </div>
+                </div>
+                
+                <div class="flex mb-4">
+                    <input type="text" id="newTagInput" class="px-3 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1" placeholder="Nhập tên thẻ mới">
+                    <button id="addTagBtn" class="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700">Thêm</button>
+                </div>
+                
+                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên thẻ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số câu hỏi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tạo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">CSharp</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">156</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/03/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900 mr-3">Sửa</button>
+                                    <button class="text-red-600 hover:text-red-900">Xóa</button>
+                                    <button class="text-gray-600 hover:text-gray-900">Gộp</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">ASP.NET</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">89</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20/03/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900 mr-3">Sửa</button>
+                                    <button class="text-red-600 hover:text-red-900">Xóa</button>
+                                    <button class="text-gray-600 hover:text-gray-900">Gộp</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex justify-between items-center mt-4">
+                    <div class="text-sm text-gray-500">
+                        Hiển thị 1 đến 10 của 56 thẻ
+                    </div>
+                    <nav class="inline-flex rounded-md shadow">
+                        <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-blue-600 font-medium">1</a>
+                        <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">2</a>
+                        <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">3</a>
+                        <a href="#" class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 rounded-r-md">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Content Management -->
+            <div id="adminContentContent" class="p-6" style="display: none;">
+                <div class="mb-6">
+                    <h4 class="font-bold text-lg mb-3">Quản lý Nội dung</h4>
+                    <div class="space-y-4">
+                        <div class="border p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h5 class="font-medium">Câu hỏi: "Làm thế nào để implement Dependency Injection trong ASP.NET Core?"</h5>
+                                <div class="flex space-x-2">
+                                    <button class="text-blue-600 hover:text-blue-900 text-sm">Sửa</button>
+                                    <button class="text-red-600 hover:text-red-900 text-sm">Xóa</button>
+                                    <button class="text-gray-600 hover:text-gray-900 text-sm">Đóng</button>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500">Đăng bởi: NguyenVanA - 2 giờ trước</div>
+                        </div>
+                        <div class="border p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h5 class="font-medium">Câu trả lời: "Bạn có thể inject service vào controller qua constructor..."</h5>
+                                <div class="flex space-x-2">
+                                    <button class="text-blue-600 hover:text-blue-900 text-sm">Sửa</button>
+                                    <button class="text-red-600 hover:text-red-900 text-sm">Xóa</button>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500">Đăng bởi: LeVanC - 30 phút trước</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Management -->
+            <div id="adminReportsContent" class="p-6" style="display: none;">
+                <h4 class="font-bold text-lg mb-3">Quản lý Báo cáo</h4>
+                <div class="space-y-4">
+                    <div class="border p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h5 class="font-medium">Báo cáo câu hỏi: "Làm thế nào để hack Facebook?"</h5>
+                                <div class="text-sm text-gray-500">Lý do: Nội dung vi phạm chính sách</div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-900 text-sm">Xem chi tiết</button>
+                                <button class="text-red-600 hover:text-red-900 text-sm">Xóa nội dung</button>
+                                <button class="text-green-600 hover:text-green-900 text-sm">Bỏ qua</button>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-500">Báo cáo bởi: 3 người dùng - Lần cuối: 1 giờ trước</div>
+                    </div>
+                    <div class="border p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h5 class="font-medium">Báo cáo người dùng: "UserSpam123"</h5>
+                                <div class="text-sm text-gray-500">Lý do: Đăng nội dung spam</div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-900 text-sm">Xem chi tiết</button>
+                                <button class="text-red-600 hover:text-red-900 text-sm">Khóa tài khoản</button>
+                                <button class="text-green-600 hover:text-green-900 text-sm">Bỏ qua</button>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-500">Báo cáo bởi: 5 người dùng - Lần cuối: 3 giờ trước</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="userProfileModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Hồ sơ Người dùng</h3>
+                <button id="closeUserProfileModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="w-full md:w-1/3">
+                        <div class="flex flex-col items-center">
+                            <div class="w-32 h-32 rounded-full bg-blue-500 text-white flex items-center justify-center text-4xl mb-4">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="text-xl font-bold" id="profileName">Nguyen Van A</h4>
+                            <div class="text-blue-600 mb-2 reputation-score">1,245 điểm</div>
+                            <div class="text-gray-500 text-sm mb-4">Thành viên từ: <span id="profileJoinDate">15/03/2023</span></div>
+                            <button id="editProfileBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 mb-4">Chỉnh sửa hồ sơ</button>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <h5 class="font-bold mb-2">Thông tin cá nhân</h5>
+                            <div class="space-y-2 text-sm" id="profileInfo">
+                                <div>
+                                    <span class="font-medium">Email:</span>
+                                    <span class="text-gray-600" id="profileEmail">a.nguyen@daihocdainam.edu.vn</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Khoa/Viện:</span>
+                                    <span class="text-gray-600" id="profileFaculty">Công nghệ Thông tin</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Chuyên ngành:</span>
+                                    <span class="text-gray-600" id="profileMajor">Kỹ thuật Phần mềm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-2/3">
+                        <div class="mb-6">
+                            <h4 class="font-bold text-lg mb-3">Điểm uy tín</h4>
+                            <div class="bg-white p-4 rounded-lg shadow">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                    <div class="border-r border-gray-200 pr-4">
+                                        <div class="text-2xl font-bold text-blue-600 reputation-score">1,245</div>
+                                        <div class="text-sm text-gray-500">Tổng điểm</div>
+                                    </div>
+                                    <div class="border-r border-gray-200 pr-4">
+                                        <div class="text-2xl font-bold text-green-600">+320</div>
+                                        <div class="text-sm text-gray-500">Câu trả lời được upvote</div>
+                                    </div>
+                                    <div class="border-r border-gray-200 pr-4">
+                                        <div class="text-2xl font-bold text-green-600">+150</div>
+                                        <div class="text-sm text-gray-500">Câu trả lời được chấp nhận</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-2xl font-bold text-red-600">-25</div>
+                                        <div class="text-sm text-gray-500">Câu trả lời bị downvote</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <h5 class="font-medium mb-2">Lịch sử điểm gần đây</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center border-b pb-2">
+                                            <div>
+                                                <span class="font-medium">Câu trả lời được chấp nhận</span>
+                                                <div class="text-sm text-gray-500">Làm thế nào để implement Dependency Injection trong ASP.NET Core?</div>
+                                            </div>
+                                            <span class="text-green-600 font-bold">+15</span>
+                                        </div>
+                                        <div class="flex justify-between items-center border-b pb-2">
+                                            <div>
+                                                <span class="font-medium">Câu trả lời được upvote</span>
+                                                <div class="text-sm text-gray-500">Cách tối ưu truy vấn SQL với nhiều bảng join?</div>
+                                            </div>
+                                            <span class="text-green-600 font-bold">+10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-lg">Câu hỏi (<span id="userQuestionsCount">24</span>)</h4>
+                                <a href="#" class="text-sm text-blue-600 hover:underline">Xem tất cả</a>
+                            </div>
+                            <div class="space-y-3" id="userQuestionsList">
+                                <div class="border-l-4 border-blue-500 pl-3 py-1">
+                                    <a href="#" class="font-medium hover:text-blue-600">Cách tối ưu truy vấn SQL với nhiều bảng join?</a>
+                                    <div class="text-sm text-gray-500">5 giờ trước • 3 câu trả lời • 15 upvotes</div>
+                                </div>
+                                <div class="border-l-4 border-blue-500 pl-3 py-1">
+                                    <a href="#" class="font-medium hover:text-blue-600">Khác biệt giữa abstract class và interface trong C#?</a>
+                                    <div class="text-sm text-gray-500">1 ngày trước • 7 câu trả lời • 8 upvotes</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-lg">Câu trả lời (<span id="userAnswersCount">56</span>)</h4>
+                                <a href="#" class="text-sm text-blue-600 hover:underline">Xem tất cả</a>
+                            </div>
+                            <div class="space-y-3" id="userAnswersList">
+                                <div class="border-l-4 border-green-500 pl-3 py-1">
+                                    <a href="#" class="font-medium hover:text-blue-600">Trả lời: Làm thế nào để implement Dependency Injection trong ASP.NET Core?</a>
+                                    <div class="text-sm text-gray-500">1 giờ trước • 15 upvotes • Được chấp nhận</div>
+                                </div>
+                                <div class="border-l-4 border-green-500 pl-3 py-1">
+                                    <a href="#" class="font-medium hover:text-blue-600">Trả lời: Cách tối ưu truy vấn SQL với nhiều bảng join?</a>
+                                    <div class="text-sm text-gray-500">3 giờ trước • 8 upvotes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-xl font-bold">Chỉnh sửa hồ sơ</h3>
+                <button id="closeEditProfileModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="editProfileForm">
+                    <div class="mb-4">
+                        <label for="editName" class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                        <input type="text" id="editName" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="editEmail" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editFaculty" class="block text-sm font-medium text-gray-700 mb-1">Khoa/Viện</label>
+                        <input type="text" id="editFaculty" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editMajor" class="block text-sm font-medium text-gray-700 mb-1">Chuyên ngành</label>
+                        <input type="text" id="editMajor" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancelEditProfile" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Hủy bỏ
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">DNU Q&A Hub</h3>
+                    <p class="text-sm text-gray-300">Diễn đàn hỏi đáp dành cho sinh viên và giảng viên Đại học Đại Nam.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Liên kết</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Trang chủ</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Câu hỏi</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Thẻ</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Người dùng</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Thông tin</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Về chúng tôi</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Điều khoản</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Câu hỏi thường gặp</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Liên hệ</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span class="text-gray-300">Số 1, Phố Xốm, Hà Đông, Hà Nội</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <span class="text-gray-300">support@dnuqahub.edu.vn</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2"></i>
+                            <span class="text-gray-300">(024) 1234 5678</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-sm text-gray-400">
+                <p>© 2023 DNU Q&A Hub. Bản quyền thuộc về Đại học Đại Nam.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const users = [
+            {
+                id: 1,
+                name: "Nguyen Van A",
+                email: "admin@daihocdainam.edu.vn",
+                password: "admin123",
+                role: "admin",
+                faculty: "Công nghệ Thông tin",
+                major: "Kỹ thuật Phần mềm",
+                joinDate: "15/03/2023",
+                reputation: 1245,
+                questions: [
+                    {
+                        id: 1,
+                        title: "Làm thế nào để implement Dependency Injection trong ASP.NET Core?",
+                        date: "2 giờ trước",
+                        answers: 5,
+                        votes: 24,
+                        views: 24
+                    },
+                    {
+                        id: 3,
+                        title: "Cách tối ưu truy vấn SQL với nhiều bảng join?",
+                        date: "5 giờ trước",
+                        answers: 3,
+                        votes: 15,
+                        views: 15
+                    }
+                ],
+                answers: [
+                    {
+                        id: 1,
+                        questionId: 2,
+                        questionTitle: "Khác biệt giữa abstract class và interface trong C#?",
+                        date: "1 ngày trước",
+                        votes: 8,
+                        accepted: false
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: "Tran Thi B",
+                email: "user@daihocdainam.edu.vn",
+                password: "user123",
+                role: "user",
+                faculty: "Công nghệ Thông tin",
+                major: "Hệ thống Thông tin",
+                joinDate: "20/03/2023",
+                reputation: 987,
+                questions: [
+                    {
+                        id: 2,
+                        title: "Khác biệt giữa abstract class và interface trong C#?",
+                        date: "1 ngày trước",
+                        answers: 7,
+                        votes: 8,
+                        views: 45
+                    }
+                ],
+                answers: [
+                    {
+                        id: 2,
+                        questionId: 1,
+                        questionTitle: "Làm thế nào để implement Dependency Injection trong ASP.NET Core?",
+                        date: "1 giờ trước",
+                        votes: 15,
+                        accepted: true
+                    }
+                ]
+            }
+        ];
+
+        let questions = [
+            {
+                id: 1,
+                title: "Làm thế nào để implement Dependency Injection trong ASP.NET Core?",
+                content: "Mình đang học ASP.NET Core và gặp khó khăn với Dependency Injection. Ai có thể giải thích cách implement nó với ví dụ cụ thể không? Mình đã thử theo tài liệu Microsoft nhưng vẫn chưa hiểu rõ cách áp dụng vào dự án thực tế.",
+                tags: ["CSharp", "ASP.NET", "Dependency-Injection"],
+                author: "NguyenVanA",
+                authorId: 1,
+                date: "2 giờ trước",
+                votes: 24,
+                answers: 5,
+                views: 24,
+                hasAcceptedAnswer: true,
+                comments: [
+                    {
+                        id: 1,
+                        content: "Bạn có thể tham khảo tài liệu chính thức của Microsoft về DI",
+                        author: "TranThiB",
+                        authorId: 2,
+                        date: "1 giờ trước"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Cách tối ưu truy vấn SQL với nhiều bảng join?",
+                content: "Mình có một truy vấn SQL join 5 bảng với nhau và thấy hiệu năng rất chậm. Có cách nào để tối ưu truy vấn này không? Mình đã thử index nhưng không cải thiện nhiều. Database đang dùng là SQL Server.",
+                tags: ["SQL", "Database", "Performance"],
+                author: "TranThiB",
+                authorId: 2,
+                date: "5 giờ trước",
+                votes: 15,
+                answers: 3,
+                views: 15,
+                hasAcceptedAnswer: false,
+                comments: []
+            }
+        ];
+
+        let answers = [
+            {
+                id: 1,
+                questionId: 1,
+                content: "Trong ASP.NET Core, Dependency Injection (DI) được tích hợp sẵn. Dưới đây là cách triển khai cơ bản:",
+                author: "TranThiB",
+                authorId: 2,
+                date: "1 giờ trước",
+                votes: 15,
+                accepted: true,
+                comments: [
+                    {
+                        id: 1,
+                        content: "Câu trả lời rất hữu ích, cảm ơn bạn!",
+                        author: "NguyenVanA",
+                        authorId: 1,
+                        date: "30 phút trước"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                questionId: 1,
+                content: "Bạn có thể inject service vào controller qua constructor:",
+                author: "LeVanC",
+                authorId: 3,
+                date: "30 phút trước",
+                votes: 8,
+                accepted: false,
+                comments: []
+            }
+        ];
+              // Thêm các hàm xử lý bình luận
+    function addQuestionComment(questionId, content) {
+        const question = questions.find(q => q.id === questionId);
+        if (question) {
+            question.comments.push({
+                id: Date.now(),
+                content,
+                author: currentUser.name,
+                authorId: currentUser.id,
+                date: "Vừa xong"
+            });
+            renderQuestionComments(questionId);
+        }
+    }
+
+    function addAnswerComment(answerId, content) {
+        const answer = answers.find(a => a.id === answerId);
+        if (answer) {
+            answer.comments.push({
+                id: Date.now(),
+                content,
+                author: currentUser.name,
+                authorId: currentUser.id,
+                date: "Vừa xong"
+            });
+            
+            const commentsContainer = document.querySelector(`.answer-comments[data-answer-id="${answerId}"]`);
+            if (commentsContainer) {
+                renderAnswerComments(answerId, commentsContainer);
+            }
+        }
+    }
+
+    function deleteComment(type, parentId, commentId) {
+        if (!currentUser) return;
+        
+        if (confirm('Bạn có chắc chắn muốn xóa bình luận này?')) {
+            if (type === 'question') {
+                const question = questions.find(q => q.id === parentId);
+                if (question) {
+                    const commentIndex = question.comments.findIndex(c => c.id === commentId);
+                    if (commentIndex !== -1) {
+                        question.comments.splice(commentIndex, 1);
+                        renderQuestionComments(parentId);
+                    }
+                }
+            } else if (type === 'answer') {
+                const answer = answers.find(a => a.id === parentId);
+                if (answer) {
+                    const commentIndex = answer.comments.findIndex(c => c.id === commentId);
+                    if (commentIndex !== -1) {
+                        answer.comments.splice(commentIndex, 1);
+                        const commentsContainer = document.querySelector(`.answer-comments[data-answer-id="${parentId}"]`);
+                        if (commentsContainer) {
+                            renderAnswerComments(parentId, commentsContainer);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+        let currentUser = null;
+
+        function renderQuestions() {
+            const questionList = document.getElementById('questionsList');
+            if (!questionList) return;
+            
+            questionList.innerHTML = questions.map(question => `
+                <div class="border-b pb-4">
+                    <div class="flex">
+                        <div class="w-16 flex flex-col items-center text-center pr-4">
+                            <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="question" data-id="${question.id}" data-vote="up">
+                                <i class="fas fa-chevron-up text-xl"></i>
+                            </button>
+                            <span class="font-bold text-lg my-1">${question.votes}</span>
+                            <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="question" data-id="${question.id}" data-vote="down">
+                                <i class="fas fa-chevron-down text-xl"></i>
+                            </button>
+                            <div class="mt-2 text-sm text-gray-500">
+                                ${question.hasAcceptedAnswer ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-check"></i>'}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold hover:text-blue-600 cursor-pointer">
+                                <a href="#" class="question-link" data-id="${question.id}">${question.title}</a>
+                            </h3>
+                            <div class="text-sm text-gray-600 line-clamp-2 mb-2">
+                                ${question.content}
+                            </div>
+                            <div class="flex flex-wrap justify-between items-center">
+                                <div class="flex flex-wrap gap-2 mb-2">
+                                    ${question.tags.map(tag => `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${tag}</span>`).join('')}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <span>Đăng bởi <a href="#" class="text-blue-600 hover:underline user-link">${question.author}</a></span>
+                                    <span class="mx-1">•</span>
+                                    <span>${question.date}</span>
+                                    <span class="mx-1">•</span>
+                                    <span>${question.answers} câu trả lời</span>
+                                    ${currentUser && (currentUser.id === question.authorId || currentUser.role === 'admin') ? `
+                                    <span class="mx-1">•</span>
+                                    <button class="text-blue-600 hover:underline edit-question" data-id="${question.id}">Sửa</button>
+                                    <span class="mx-1">•</span>
+                                    <button class="text-red-600 hover:underline delete-question" data-id="${question.id}">Xóa</button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.question-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const questionId = parseInt(link.dataset.id);
+                    const question = questions.find(q => q.id === questionId);
+                    if (question) {
+                        showQuestionDetail(question);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.edit-question').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const questionId = parseInt(btn.dataset.id);
+                    editQuestion(questionId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-question').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const questionId = parseInt(btn.dataset.id);
+                    deleteQuestion(questionId);
+                });
+            });
+        }
+
+        function showQuestionDetail(question) {
+            document.getElementById('questionDetailTitle').textContent = question.title;
+            document.getElementById('questionDetailContent').innerHTML = `
+                <p>${question.content}</p>
+            `;
+            document.getElementById('questionVotes').textContent = question.votes;
+            document.getElementById('questionDetailTags').innerHTML = `
+                ${question.tags.map(tag => `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${tag}</span>`).join('')}
+            `;
+            document.getElementById('questionDetailMeta').innerHTML = `
+                <div class="flex items-center">
+                    <span>Đăng bởi <a href="#" class="text-blue-600 hover:underline user-link">${question.author}</a></span>
+                    <span class="mx-1">•</span>
+                    <span>${question.date}</span>
+                    <span class="mx-1">•</span>
+                    <span>${question.answers} câu trả lời</span>
+                    <span class="mx-1">•</span>
+                    <span>${question.views} lượt xem</span>
+                </div>
+                ${currentUser && (currentUser.id === question.authorId || currentUser.role === 'admin') ? `
+                <div class="mt-1">
+                    <button class="text-blue-600 hover:underline mr-3 edit-question" data-id="${question.id}">Chỉnh sửa</button>
+                    <button class="text-red-600 hover:underline delete-question" data-id="${question.id}">Xóa</button>
+                </div>
+                ` : ''}
+            `;}
+            function renderQuestionComments(questionId) {
+        const question = questions.find(q => q.id === questionId);
+        if (!question) return;
+        
+        const commentsContainer = document.getElementById('questionComments');
+        if (!commentsContainer) return;
+        
+        commentsContainer.innerHTML = question.comments.map(comment => `
+            <div class="comment-item">
+                <div class="text-sm">${comment.content}</div>
+                <div class="text-xs text-gray-500">— ${comment.author} • ${comment.date}</div>
+                ${currentUser && (currentUser.id === comment.authorId || currentUser.role === 'admin') ? `
+                <div class="mt-1 flex justify-end">
+                    <button class="text-xs text-red-600 hover:text-red-800 delete-comment" 
+                            data-type="question" 
+                            data-id="${questionId}" 
+                            data-comment-id="${comment.id}">
+                        Xóa
+                    </button>
+                </div>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.delete-comment[data-type="question"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const commentId = parseInt(btn.dataset.commentId);
+                deleteComment('question', questionId, commentId);
+            });
+        });
+    }
+
+    // Cập nhật hàm renderAnswerComments
+    function renderAnswerComments(answerId, container) {
+        const answer = answers.find(a => a.id === answerId);
+        if (!answer) return;
+        
+        container.innerHTML = answer.comments.map(comment => `
+            <div class="comment-item">
+                <div class="text-sm">${comment.content}</div>
+                <div class="text-xs text-gray-500">— ${comment.author} • ${comment.date}</div>
+                ${currentUser && (currentUser.id === comment.authorId || currentUser.role === 'admin') ? `
+                <div class="mt-1 flex justify-end">
+                    <button class="text-xs text-red-600 hover:text-red-800 delete-comment" 
+                            data-type="answer" 
+                            data-id="${answerId}" 
+                            data-comment-id="${comment.id}">
+                        Xóa
+                    </button>
+                </div>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        container.querySelectorAll('.delete-comment[data-type="answer"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const commentId = parseInt(btn.dataset.commentId);
+                deleteComment('answer', answerId, commentId);
+            });
+        });
+    }
+
+    function showQuestionDetail(question) {
+    questionDetailModal.dataset.questionId = question.id;
+
+    // Xử lý bình luận cho câu hỏi
+if (document.getElementById('questionCommentForm')) {
+    document.getElementById('questionCommentForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) {
+            alert('Vui lòng đăng nhập để bình luận');
+            return;
+        }
+        
+        const commentInput = document.querySelector('#questionCommentForm textarea');
+        const commentContent = commentInput.value.trim();
+        
+        if (commentContent) {
+            const questionId = parseInt(document.querySelector('#questionDetailModal').dataset.questionId);
+            addQuestionComment(questionId, commentContent);
+            commentInput.value = '';
+        } else {
+            alert('Vui lòng nhập nội dung bình luận');
+        }
+    });
+}
+
+// Xử lý bình luận cho câu trả lời
+document.addEventListener('submit', (e) => {
+    if (e.target.closest('.answer-comment-form')) {
+        e.preventDefault();
+        if (!currentUser) {
+            alert('Vui lòng đăng nhập để bình luận');
+            return;
+        }
+        
+        const form = e.target.closest('.answer-comment-form');
+        const answerId = parseInt(form.dataset.answerId);
+        const commentInput = form.querySelector('textarea');
+        const commentContent = commentInput.value.trim();
+        
+        if (commentContent) {
+            addAnswerComment(answerId, commentContent);
+            commentInput.value = '';
+        } else {
+            alert('Vui lòng nhập nội dung bình luận');
+        }
+    }
+});
+
+            const editBtn = document.querySelector('#questionDetailModal .edit-question');
+            const deleteBtn = document.querySelector('#questionDetailModal .delete-question');
+            
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    editQuestion(question.id);
+                });
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    deleteQuestion(question.id);
+                });
+            }
+            
+            renderQuestionComments(question.id);
+            
+            const questionAnswers = answers.filter(a => a.questionId === question.id);
+            questionAnswers.forEach(answer => {
+                const answerElement = document.querySelector(`.answer-item[data-author-id="${answer.authorId}"]`);
+                if (answerElement) {
+                    const commentsContainer = answerElement.querySelector('.answer-comments');
+                    if (commentsContainer) {
+                        renderAnswerComments(answer.id, commentsContainer);
+                    }
+                }
+            });
+            
+            questionDetailModal.classList.remove('hidden');
+        }
+
+        function renderQuestionComments(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+            
+            const commentsContainer = document.getElementById('questionComments');
+            if (!commentsContainer) return;
+            
+            commentsContainer.innerHTML = question.comments.map(comment => `
+                <div class="comment-item">
+                    <div class="text-sm">${comment.content}</div>
+                    <div class="text-xs text-gray-500">— ${comment.author} • ${comment.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderAnswerComments(answerId, container) {
+            const answer = answers.find(a => a.id === answerId);
+            if (!answer) return;
+            
+            container.innerHTML = answer.comments.map(comment => `
+                <div class="comment-item">
+                    <div class="text-sm">${comment.content}</div>
+                    <div class="text-xs text-gray-500">— ${comment.author} • ${comment.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function editQuestion(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+            
+            if (!currentUser || (currentUser.id !== question.authorId && currentUser.role !== 'admin')) {
+                alert('Bạn không có quyền sửa câu hỏi này');
+                return;
+            }
+            
+            document.getElementById('questionTitle').value = question.title;
+            document.getElementById('questionContent').value = question.content;
+            
+            const selectedTags = document.getElementById('selectedTags');
+            selectedTags.innerHTML = '';
+            question.tags.forEach(tag => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center';
+                tagElement.dataset.tag = tag;
+                
+                const tagText = document.createElement('span');
+                tagText.textContent = tag;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'ml-1 text-blue-600 hover:text-blue-800';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.addEventListener('click', () => {
+                    tagElement.remove();
+                });
+                
+                tagElement.appendChild(tagText);
+                tagElement.appendChild(removeBtn);
+                selectedTags.appendChild(tagElement);
+            });
+            
+            document.querySelector('#askQuestionModal h3').textContent = 'Chỉnh sửa câu hỏi';
+            askQuestionModal.classList.remove('hidden');
+            
+            const originalForm = document.getElementById('askQuestionForm');
+            const originalSubmit = originalForm.onsubmit;
+            
+            originalForm.onsubmit = function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('questionTitle').value;
+                const content = document.getElementById('questionContent').value;
+                const tags = Array.from(document.querySelectorAll('#selectedTags [data-tag]')).map(tag => tag.dataset.tag);
+                
+                if (!title || !content || tags.length === 0) {
+                    alert('Vui lòng điền đầy đủ thông tin và chọn ít nhất 1 thẻ');
+                    return;
+                }
+                
+                question.title = title;
+                question.content = content;
+                question.tags = tags;
+                
+                renderQuestions();
+                if (!questionDetailModal.classList.contains('hidden')) {
+                    document.getElementById('questionDetailTitle').textContent = question.title;
+                    document.getElementById('questionDetailContent').innerHTML = `
+                        <p>${question.content}</p>
+                    `;
+                    document.getElementById('questionDetailTags').innerHTML = `
+                        ${question.tags.map(tag => `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${tag}</span>`).join('')}
+                    `;
+                }
+                
+                alert('Câu hỏi đã được cập nhật thành công!');
+                askQuestionModal.classList.add('hidden');
+                
+                document.getElementById('questionTitle').value = '';
+                document.getElementById('questionContent').value = '';
+                document.getElementById('selectedTags').innerHTML = '';
+                document.querySelector('#askQuestionModal h3').textContent = 'Đặt câu hỏi mới';
+                originalForm.onsubmit = originalSubmit;
+            };
+        }
+
+        function deleteQuestion(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+            
+            if (!currentUser || (currentUser.id !== question.authorId && currentUser.role !== 'admin')) {
+                alert('Bạn không có quyền xóa câu hỏi này');
+                return;
+            }
+            
+            if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+                questions = questions.filter(q => q.id !== questionId);
+                renderQuestions();
+                
+                if (!questionDetailModal.classList.contains('hidden')) {
+                    questionDetailModal.classList.add('hidden');
+                }
+                
+                alert('Câu hỏi đã được xóa thành công!');
+            }
+        }
+
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const askQuestionBtn = document.getElementById('askQuestionBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const askQuestionModal = document.getElementById('askQuestionModal');
+        const questionDetailModal = document.getElementById('questionDetailModal');
+        const adminDashboardModal = document.getElementById('adminDashboardModal');
+        const userProfileModal = document.getElementById('userProfileModal');
+        const editProfileModal = document.getElementById('editProfileModal');
+        
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+        const closeAskQuestionModal = document.getElementById('closeAskQuestionModal');
+        const closeQuestionDetailModal = document.getElementById('closeQuestionDetailModal');
+        const closeAdminDashboardModal = document.getElementById('closeAdminDashboardModal');
+        const closeUserProfileModal = document.getElementById('closeUserProfileModal');
+        const closeEditProfileModal = document.getElementById('closeEditProfileModal');
+        
+        const switchToRegister = document.getElementById('switchToRegister');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const cancelQuestion = document.getElementById('cancelQuestion');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const cancelEditProfile = document.getElementById('cancelEditProfile');
+        
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                loginModal.classList.remove('hidden');
+            });
+        }
+        
+        if (registerBtn) {
+            registerBtn.addEventListener('click', () => {
+                registerModal.classList.remove('hidden');
+            });
+        }
+        
+        if (askQuestionBtn) {
+            askQuestionBtn.addEventListener('click', () => {
+                if (!currentUser) {
+                    loginModal.classList.remove('hidden');
+                    return;
+                }
+                document.querySelector('#askQuestionModal h3').textContent = 'Đặt câu hỏi mới';
+                askQuestionModal.classList.remove('hidden');
+            });
+        }
+        
+        if (adminBtn) {
+            adminBtn.addEventListener('click', () => {
+                adminDashboardModal.classList.remove('hidden');
+            });
+        }
+        
+        if (closeLoginModal) {
+            closeLoginModal.addEventListener('click', () => {
+                loginModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeRegisterModal) {
+            closeRegisterModal.addEventListener('click', () => {
+                registerModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeAskQuestionModal) {
+            closeAskQuestionModal.addEventListener('click', () => {
+                askQuestionModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeQuestionDetailModal) {
+            closeQuestionDetailModal.addEventListener('click', () => {
+                questionDetailModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeAdminDashboardModal) {
+            closeAdminDashboardModal.addEventListener('click', () => {
+                adminDashboardModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeUserProfileModal) {
+            closeUserProfileModal.addEventListener('click', () => {
+                userProfileModal.classList.add('hidden');
+            });
+        }
+        
+        if (closeEditProfileModal) {
+            closeEditProfileModal.addEventListener('click', () => {
+                editProfileModal.classList.add('hidden');
+            });
+        }
+        
+        if (switchToRegister) {
+            switchToRegister.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginModal.classList.add('hidden');
+                registerModal.classList.remove('hidden');
+            });
+        }
+        
+        if (switchToLogin) {
+            switchToLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerModal.classList.add('hidden');
+                loginModal.classList.remove('hidden');
+            });
+        }
+        
+        if (cancelQuestion) {
+            cancelQuestion.addEventListener('click', () => {
+                askQuestionModal.classList.add('hidden');
+            });
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentUser = null;
+                resetUIAfterLogout();
+                alert('Bạn đã đăng xuất thành công!');
+            });
+        }
+
+        function resetUIAfterLogout() {
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userNav').style.display = 'none';
+            document.getElementById('adminBtn').classList.add('hidden');
+            document.getElementById('accountManagement').style.display = 'none';
+        }
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.add('hidden');
+            }
+            if (e.target === registerModal) {
+                registerModal.classList.add('hidden');
+            }
+            if (e.target === askQuestionModal) {
+                askQuestionModal.classList.add('hidden');
+            }
+            if (e.target === questionDetailModal) {
+                questionDetailModal.classList.add('hidden');
+            }
+            if (e.target === adminDashboardModal) {
+                adminDashboardModal.classList.add('hidden');
+            }
+            if (e.target === userProfileModal) {
+                userProfileModal.classList.add('hidden');
+            }
+            if (e.target === editProfileModal) {
+                editProfileModal.classList.add('hidden');
+            }
+        });
+        
+        const tagInput = document.getElementById('tagInput');
+        const tagSuggestions = document.getElementById('tagSuggestions');
+        const selectedTags = document.getElementById('selectedTags');
+        
+        if (tagInput && tagSuggestions && selectedTags) {
+            const popularTags = [
+                'FIT4016', 'CSharp', 'Database', 'OOP', 'TuyenSinh', 
+                'ASP.NET', 'JavaScript', 'SQL', 'Algorithm', 'DataStructure',
+                'WebDevelopment', 'Mobile', 'AI', 'MachineLearning', 'Python'
+            ];
+            
+            tagInput.addEventListener('input', () => {
+                const inputValue = tagInput.value.trim().toLowerCase();
+                
+                if (inputValue.length > 0) {
+                    const filteredTags = popularTags.filter(tag => 
+                        tag.toLowerCase().includes(inputValue)
+                    );
+                    
+                    if (filteredTags.length > 0) {
+                        tagSuggestions.innerHTML = '';
+                        filteredTags.forEach(tag => {
+                            const tagElement = document.createElement('div');
+                            tagElement.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer';
+                            tagElement.textContent = tag;
+                            tagElement.addEventListener('click', () => {
+                                addTag(tag);
+                                tagInput.value = '';
+                                tagSuggestions.classList.add('hidden');
+                            });
+                            tagSuggestions.appendChild(tagElement);
+                        });
+                        tagSuggestions.classList.remove('hidden');
+                    } else {
+                        tagSuggestions.classList.add('hidden');
+                    }
+                } else {
+                    tagSuggestions.classList.add('hidden');
+                }
+            });
+            
+            tagInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const tagValue = tagInput.value.trim();
+                    if (tagValue && !selectedTags.querySelector(`[data-tag="${tagValue}"]`)) {
+                        addTag(tagValue);
+                        tagInput.value = '';
+                        tagSuggestions.classList.add('hidden');
+                    }
+                }
+            });
+            
+            function addTag(tagName) {
+                if (selectedTags.children.length >= 5) return;
+                
+                const tagElement = document.createElement('div');
+                tagElement.className = 'bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center';
+                tagElement.dataset.tag = tagName;
+                
+                const tagText = document.createElement('span');
+                tagText.textContent = tagName;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'ml-1 text-blue-600 hover:text-blue-800';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.addEventListener('click', () => {
+                    tagElement.remove();
+                });
+                
+                tagElement.appendChild(tagText);
+                tagElement.appendChild(removeBtn);
+                selectedTags.appendChild(tagElement);
+            }
+        }
+        
+        document.querySelectorAll('.editor-toolbar button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const textarea = button.closest('form').querySelector('textarea');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = textarea.value.substring(start, end);
+                let newText = '';
+                
+                switch (button.querySelector('i').className) {
+                    case 'fas fa-bold':
+                        newText = selectedText ? `**${selectedText}**` : '**bold text**';
+                        break;
+                    case 'fas fa-italic':
+                        newText = selectedText ? `*${selectedText}*` : '*italic text*';
+                        break;
+                    case 'fas fa-heading':
+                        newText = selectedText ? `\n## ${selectedText}\n` : '\n## Heading\n';
+                        break;
+                    case 'fas fa-quote-right':
+                        newText = selectedText ? `> ${selectedText}` : '> Quote';
+                        break;
+                    case 'fas fa-code':
+                        newText = selectedText ? `\`${selectedText}\`` : '`code`';
+                        break;
+                    case 'fas fa-link':
+                        newText = selectedText ? `[${selectedText}](url)` : '[link text](url)';
+                        break;
+                    case 'fas fa-image':
+                        newText = selectedText ? `![${selectedText}](image-url)` : '![alt text](image-url)';
+                        break;
+                    case 'fas fa-list-ul':
+                        newText = selectedText ? `- ${selectedText.split('\n').join('\n- ')}` : '- List item';
+                        break;
+                    case 'fas fa-list-ol':
+                        newText = selectedText ? `1. ${selectedText.split('\n').join('\n1. ')}` : '1. Numbered item';
+                        break;
+                }
+                
+                textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+                
+                if (!selectedText) {
+                    const newCursorPos = start + newText.length;
+                    if (newText.includes('**') || newText.includes('*') || newText.includes('`')) {
+                        textarea.setSelectionRange(start + 2, start + 2 + (selectedText ? selectedText.length : 9));
+                    } else if (newText.includes('##') || newText.includes('>') || newText.includes('-') || newText.includes('1.')) {
+                        textarea.setSelectionRange(start + newText.indexOf(' ') + 1, start + newText.indexOf(' ') + 1 + (selectedText ? selectedText.length : 9));
+                    } else if (newText.includes('[') || newText.includes('![')) {
+                        textarea.setSelectionRange(start + newText.indexOf(']') + 2, start + newText.indexOf(']') + 5);
+                    }
+                } else {
+                    textarea.setSelectionRange(start, start + newText.length);
+                }
+                
+                textarea.focus();
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.vote-btn')) {
+                const btn = e.target.closest('.vote-btn');
+                const type = btn.dataset.type;
+                const id = btn.dataset.id;
+                const vote = btn.dataset.vote;
+                
+                const voteElement = btn.parentElement.querySelector('.font-bold');
+                let currentVotes = parseInt(voteElement.textContent);
+                
+                const hasUpvoted = btn.parentElement.querySelector('[data-vote="up"]').classList.contains('text-blue-600');
+                const hasDownvoted = btn.parentElement.querySelector('[data-vote="down"]').classList.contains('text-blue-600');
+                
+                if (vote === 'up') {
+                    if (hasUpvoted) {
+                        voteElement.textContent = currentVotes - 1;
+                        btn.classList.remove('text-blue-600');
+                        btn.classList.add('text-gray-500');
+                    } else {
+                        voteElement.textContent = currentVotes + (hasDownvoted ? 2 : 1);
+                        btn.classList.add('text-blue-600');
+                        btn.classList.remove('text-gray-500');
+                        
+                        if (hasDownvoted) {
+                            const downBtn = btn.parentElement.querySelector('[data-vote="down"]');
+                            downBtn.classList.remove('text-blue-600');
+                            downBtn.classList.add('text-gray-500');
+                        }
+                        
+                        if (type === 'answer') {
+                            updateReputation(btn.closest('.answer-item').dataset.authorId, 10);
+                        }
+                    }
+                } else {
+                    if (hasDownvoted) {
+                        voteElement.textContent = currentVotes + 1;
+                        btn.classList.remove('text-blue-600');
+                        btn.classList.add('text-gray-500');
+                    } else {
+                        voteElement.textContent = currentVotes - (hasUpvoted ? 2 : 1);
+                        btn.classList.add('text-blue-600');
+                        btn.classList.remove('text-gray-500');
+                        
+                        if (hasUpvoted) {
+                            const upBtn = btn.parentElement.querySelector('[data-vote="up"]');
+                            upBtn.classList.remove('text-blue-600');
+                            upBtn.classList.add('text-gray-500');
+                        }
+                        
+                        if (type === 'answer') {
+                            updateReputation(btn.closest('.answer-item').dataset.authorId, -2);
+                        }
+                    }
+                }
+            }
+
+            if (e.target.closest('.accept-btn')) {
+                const btn = e.target.closest('.accept-btn');
+                const answerId = btn.dataset.answerId;
+                const questionId = btn.dataset.questionId;
+                
+                document.querySelectorAll('.fa-check-circle').forEach(icon => {
+                    if (icon.classList.contains('text-green-600')) {
+                        icon.classList.remove('text-green-600');
+                        icon.classList.add('text-gray-500');
+                        icon.closest('.bg-green-50')?.classList.remove('bg-green-50');
+                    }
+                });
+                
+                btn.innerHTML = '<i class="fas fa-check-circle text-xl text-green-600"></i>';
+                btn.closest('.border-b').classList.add('bg-green-50');
+                
+                const authorId = btn.closest('.answer-item').dataset.authorId;
+                updateReputation(authorId, 15);
+            }
+        });
+
+        function updateReputation(userId, points) {
+            const userElements = document.querySelectorAll(`[data-user-id="${userId}"] .reputation-score`);
+            userElements.forEach(el => {
+                const currentRep = parseInt(el.textContent.replace(/,/g, ''));
+                el.textContent = (currentRep + points).toLocaleString();
+            });
+        }
+
+        if (document.getElementById('addTagBtn')) {
+            document.getElementById('addTagBtn').addEventListener('click', () => {
+                const tagName = document.getElementById('newTagInput').value.trim();
+                if (tagName) {
+                    const tableBody = document.querySelector('#adminTagsContent tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${tagName}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date().toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3">Sửa</button>
+                            <button class="text-red-600 hover:text-red-900">Xóa</button>
+                            <button class="text-gray-600 hover:text-gray-900">Gộp</button>
+                        </td>
+                    `;
+                    tableBody.prepend(newRow);
+                    document.getElementById('newTagInput').value = '';
+                }
+            });
+
+            document.querySelector('#adminTagsContent').addEventListener('click', (e) => {
+                if (e.target.closest('.text-red-600')) {
+                    const row = e.target.closest('tr');
+                    if (confirm('Bạn có chắc chắn muốn xóa thẻ này?')) {
+                        row.remove();
+                    }
+                } else if (e.target.closest('.text-blue-600')) {
+                    const tagSpan = e.target.closest('tr').querySelector('span');
+                    const newName = prompt('Nhập tên mới cho thẻ:', tagSpan.textContent);
+                    if (newName && newName !== tagSpan.textContent) {
+                        tagSpan.textContent = newName;
+                    }
+                } else if (e.target.closest('.text-gray-600')) {
+                    const tagName = e.target.closest('tr').querySelector('span').textContent;
+                    const targetTag = prompt(`Nhập tên thẻ muốn gộp "${tagName}" vào:`);
+                    if (targetTag) {
+                        e.target.closest('tr').remove();
+                        alert(`Đã gộp thẻ "${tagName}" vào "${targetTag}"`);
+                    }
+                }
+            });
+        }
+
+        if (document.getElementById('answerForm')) {
+            document.getElementById('answerForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const answerContent = document.getElementById('answerContent').value;
+                
+                if (answerContent.trim()) {
+                    alert('Câu trả lời của bạn đã được đăng!');
+                    document.getElementById('answerContent').value = '';
+                } else {
+                    alert('Vui lòng nhập nội dung câu trả lời');
+                }
+            });
+        }
+
+        document.querySelectorAll('.user-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const username = link.textContent;
+                const user = users.find(u => u.name === username || u.name.split(' ').pop() === username);
+                if (user) {
+                    updateUserProfileModal(user);
+                    userProfileModal.classList.remove('hidden');
+                }
+            });
+        });
+
+        const adminUsersTab = document.getElementById('adminUsersTab');
+        const adminTagsTab = document.getElementById('adminTagsTab');
+        const adminContentTab = document.getElementById('adminContentTab');
+        const adminReportsTab = document.getElementById('adminReportsTab');
+
+        const adminUsersContent = document.getElementById('adminUsersContent');
+        const adminTagsContent = document.getElementById('adminTagsContent');
+        const adminContentContent = document.getElementById('adminContentContent');
+        const adminReportsContent = document.getElementById('adminReportsContent');
+
+        function switchAdminTab(activeTab, activeContent) {
+            [adminUsersTab, adminTagsTab, adminContentTab, adminReportsTab].forEach(tab => {
+                if (tab) {
+                    tab.classList.remove('border-blue-500', 'text-blue-600');
+                    tab.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+            
+            [adminUsersContent, adminTagsContent, adminContentContent, adminReportsContent].forEach(content => {
+                if (content) content.style.display = 'none';
+            });
+            
+            if (activeTab) {
+                activeTab.classList.add('border-blue-500', 'text-blue-600');
+                activeTab.classList.remove('border-transparent', 'text-gray-500');
+            }
+            
+            if (activeContent) activeContent.style.display = 'block';
+        }
+
+        if (adminUsersTab) adminUsersTab.addEventListener('click', () => switchAdminTab(adminUsersTab, adminUsersContent));
+        if (adminTagsTab) adminTagsTab.addEventListener('click', () => switchAdminTab(adminTagsTab, adminTagsContent));
+        if (adminContentTab) adminContentTab.addEventListener('click', () => switchAdminTab(adminContentTab, adminContentContent));
+        if (adminReportsTab) adminReportsTab.addEventListener('click', () => switchAdminTab(adminReportsTab, adminReportsContent));
+
+        switchAdminTab(adminUsersTab, adminUsersContent);
+
+        if (document.getElementById('loginForm')) {
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    currentUser = user;
+                    updateUIAfterLogin();
+                    loginModal.classList.add('hidden');
+                    alert(`Đăng nhập thành công! Chào mừng ${user.name}`);
+                } else {
+                    alert('Email hoặc mật khẩu không đúng!');
+                }
+            });
+        }
+
+        function updateUIAfterLogin() {
+            document.getElementById('authButtons').style.display = 'none';
+            
+            const userNav = document.getElementById('userNav');
+            userNav.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="font-medium">${currentUser.name.split(' ').pop()}</span>
+            `;
+            userNav.style.display = 'flex';
+            userNav.addEventListener('click', () => {
+                updateUserProfileModal(currentUser);
+                userProfileModal.classList.remove('hidden');
+            });
+            
+            if (currentUser.role === 'admin') {
+                adminBtn.classList.remove('hidden');
+            } else {
+                adminBtn.classList.add('hidden');
+            }
+            
+            document.getElementById('accountManagement').style.display = 'block';
+            updateAccountManagement();
+            renderQuestions();
+        }
+
+        function updateAccountManagement() {
+            const accountInfo = document.querySelector('#accountManagement .flex.items-center');
+            accountInfo.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mr-3">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div class="font-medium">${currentUser.name}</div>
+                    <div class="text-xs text-gray-500">${currentUser.reputation.toLocaleString()} điểm</div>
+                </div>
+            `;
+        }
+
+        function updateUserProfileModal(user) {
+            document.getElementById('profileName').textContent = user.name;
+            document.querySelector('.reputation-score').textContent = `${user.reputation.toLocaleString()} điểm`;
+            document.getElementById('profileJoinDate').textContent = user.joinDate;
+            document.getElementById('profileEmail').textContent = user.email;
+            document.getElementById('profileFaculty').textContent = user.faculty;
+            document.getElementById('profileMajor').textContent = user.major;
+            
+            document.getElementById('userQuestionsCount').textContent = user.questions.length;
+            document.getElementById('userAnswersCount').textContent = user.answers.length;
+            
+            const userQuestionsList = document.getElementById('userQuestionsList');
+            userQuestionsList.innerHTML = user.questions.map(q => `
+                <div class="border-l-4 border-blue-500 pl-3 py-1">
+                    <a href="#" class="font-medium hover:text-blue-600">${q.title}</a>
+                    <div class="text-sm text-gray-500">${q.date} • ${q.answers} câu trả lời • ${q.votes} upvotes</div>
+                </div>
+            `).join('');
+            
+            const userAnswersList = document.getElementById('userAnswersList');
+            userAnswersList.innerHTML = user.answers.map(a => `
+                <div class="border-l-4 border-green-500 pl-3 py-1">
+                    <a href="#" class="font-medium hover:text-blue-600">Trả lời: ${a.questionTitle}</a>
+                    <div class="text-sm text-gray-500">${a.date} • ${a.votes} upvotes${a.accepted ? ' • Được chấp nhận' : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        if (document.getElementById('registerForm')) {
+            document.getElementById('registerForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                
+                if (!email.endsWith('@daihocdainam.edu.vn')) {
+                    alert('Vui lòng sử dụng email trường (@daihocdainam.edu.vn)');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Mật khẩu xác nhận không khớp');
+                    return;
+                }
+                
+                if (!document.getElementById('agreeTerms').checked) {
+                    alert('Vui lòng đồng ý với điều khoản sử dụng');
+                    return;
+                }
+                
+                if (users.some(u => u.email === email)) {
+                    alert('Email này đã được đăng ký');
+                    return;
+                }
+                
+                const newUser = {
+                    id: users.length + 1,
+                    name,
+                    email,
+                    password,
+                    role: 'user',
+                    faculty: '',
+                    major: '',
+                    joinDate: new Date().toLocaleDateString(),
+                    reputation: 0,
+                    questions: [],
+                    answers: []
+                };
+                
+                users.push(newUser);
+                alert('Đăng ký thành công! Vui lòng đăng nhập.');
+                registerModal.classList.add('hidden');
+                
+                document.getElementById('registerName').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerConfirmPassword').value = '';
+                document.getElementById('agreeTerms').checked = false;
+            });
+        }
+
+        if (document.getElementById('askQuestionForm')) {
+            document.getElementById('askQuestionForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentUser) {
+                    alert('Vui lòng đăng nhập để đặt câu hỏi');
+                    return;
+                }
+                
+                const title = document.getElementById('questionTitle').value;
+                const content = document.getElementById('questionContent').value;
+                const tags = Array.from(document.querySelectorAll('#selectedTags [data-tag]')).map(tag => tag.dataset.tag);
+                
+                if (!title || !content || tags.length === 0) {
+                    alert('Vui lòng điền đầy đủ thông tin và chọn ít nhất 1 thẻ');
+                    return;
+                }
+                
+                const newQuestion = {
+                    id: Date.now(),
+                    title,
+                    content,
+                    tags,
+                    author: currentUser.name,
+                    authorId: currentUser.id,
+                    date: "Vừa xong",
+                    votes: 0,
+                    answers: 0,
+                    views: 0,
+                    hasAcceptedAnswer: false,
+                    comments: []
+                };
+                
+                questions.unshift(newQuestion);
+                currentUser.questions.push({
+                    id: newQuestion.id,
+                    title: newQuestion.title,
+                    date: newQuestion.date,
+                    answers: 0,
+                    votes: 0,
+                    views: 0
+                });
+                
+                renderQuestions();
+                alert('Câu hỏi của bạn đã được đăng thành công!');
+                askQuestionModal.classList.add('hidden');
+                
+                document.getElementById('questionTitle').value = '';
+                document.getElementById('questionContent').value = '';
+                document.getElementById('selectedTags').innerHTML = '';
+            });
+        }
+
+        if (document.getElementById('questionCommentForm')) {
+            document.getElementById('questionCommentForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentUser) {
+                    alert('Vui lòng đăng nhập để bình luận');
+                    return;
+                }
+                
+                const commentInput = document.querySelector('#questionCommentForm textarea');
+                const commentContent = commentInput.value.trim();
+                
+                if (commentContent) {
+                    const questionId = parseInt(document.querySelector('#questionDetailModal').dataset.questionId);
+                    const question = questions.find(q => q.id === questionId);
+                    
+                    if (question) {
+                        question.comments.push({
+                            id: Date.now(),
+                            content: commentContent,
+                            author: currentUser.name,
+                            authorId: currentUser.id,
+                            date: "Vừa xong"
+                        });
+                        
+                        renderQuestionComments(questionId);
+                        commentInput.value = '';
+                    }
+                } else {
+                    alert('Vui lòng nhập nội dung bình luận');
+                }
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.answer-comment-form')) {
+                e.preventDefault();
+                const form = e.target.closest('.answer-comment-form');
+                const answerId = parseInt(form.dataset.answerId);
+                const commentInput = form.querySelector('textarea');
+                const commentContent = commentInput.value.trim();
+                
+                if (commentContent) {
+                    const answer = answers.find(a => a.id === answerId);
+                    
+                    if (answer) {
+                        answer.comments.push({
+                            id: Date.now(),
+                            content: commentContent,
+                            author: currentUser.name,
+                            authorId: currentUser.id,
+                            date: "Vừa xong"
+                        });
+                        
+                        const commentsContainer = form.previousElementSibling;
+                        if (commentsContainer) {
+                            renderAnswerComments(answerId, commentsContainer);
+                        }
+                        
+                        commentInput.value = '';
+                    }
+                } else {
+                    alert('Vui lòng nhập nội dung bình luận');
+                }
+            }
+        });
+
+        if (editProfileBtn) {
+            editProfileBtn.addEventListener('click', () => {
+                if (!currentUser) return;
+                
+                document.getElementById('editName').value = currentUser.name;
+                document.getElementById('editEmail').value = currentUser.email;
+                document.getElementById('editFaculty').value = currentUser.faculty;
+                document.getElementById('editMajor').value = currentUser.major;
+                
+                editProfileModal.classList.remove('hidden');
+            });
+        }
+
+        if (cancelEditProfile) {
+            cancelEditProfile.addEventListener('click', () => {
+                editProfileModal.classList.add('hidden');
+            });
+        }
+
+        if (document.getElementById('editProfileForm')) {
+            document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentUser) return;
+                
+                const name = document.getElementById('editName').value;
+                const email = document.getElementById('editEmail').value;
+                const faculty = document.getElementById('editFaculty').value;
+                const major = document.getElementById('editMajor').value;
+                
+                currentUser.name = name;
+                currentUser.email = email;
+                currentUser.faculty = faculty;
+                currentUser.major = major;
+                
+                updateUserProfileModal(currentUser);
+                updateAccountManagement();
+                
+                const userNav = document.getElementById('userNav');
+                if (userNav) {
+                    userNav.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="font-medium">${currentUser.name.split(' ').pop()}</span>
+                    `;
+                    userNav.addEventListener('click', () => {
+                        updateUserProfileModal(currentUser);
+                        userProfileModal.classList.remove('hidden');
+                    });
+                }
+                
+                alert('Hồ sơ đã được cập nhật thành công!');
+                editProfileModal.classList.add('hidden');
+            });
+        }
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tab = link.textContent.trim();
+                
+                switch(tab) {
+                    case 'Trang chủ':
+                        alert('Đang hiển thị trang chủ');
+                        break;
+                    case 'Câu hỏi':
+                        alert('Đang hiển thị danh sách câu hỏi');
+                        break;
+                    case 'Thẻ':
+                        alert('Đang hiển thị danh sách thẻ');
+                        break;
+                    case 'Người dùng':
+                        alert('Đang hiển thị danh sách người dùng');
+                        break;
+                }
+            });
+        });
+
+        document.querySelectorAll('#accountManagement a').forEach(link => {
+            if (!link.id) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const action = link.querySelector('span').textContent;
+                    
+                    switch(action) {
+                        case 'Hồ sơ cá nhân':
+                            updateUserProfileModal(currentUser);
+                            userProfileModal.classList.remove('hidden');
+                            break;
+                        case 'Câu hỏi của tôi':
+                            alert('Đang hiển thị câu hỏi của bạn');
+                            break;
+                        case 'Câu trả lời của tôi':
+                            alert('Đang hiển thị câu trả lời của bạn');
+                            break;
+                        case 'Đã lưu':
+                            alert('Đang hiển thị nội dung đã lưu');
+                            break;
+                        case 'Cài đặt':
+                            alert('Đang mở trang cài đặt');
+                            break;
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuestions();
+        });
+        // Thêm vào phần script hiện có
+
+// Bình luận cho câu hỏi
+function addQuestionComment(questionId, content) {
+    const question = questions.find(q => q.id === questionId);
+    if (question) {
+        question.comments.push({
+            id: Date.now(),
+            content,
+            author: currentUser.name,
+            authorId: currentUser.id,
+            date: "Vừa xong"
+        });
+        renderQuestionComments(questionId);
+    }
+}
+
+// Tìm kiếm và lọc
+function searchQuestions(query, filterTag, sortBy) {
+    let results = [...questions];
+    
+    if (query) {
+        const lowerQuery = query.toLowerCase();
+        results = results.filter(q => 
+            q.title.toLowerCase().includes(lowerQuery) || 
+            q.content.toLowerCase().includes(lowerQuery) ||
+            q.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+    )}
+    
+    if (filterTag) {
+        results = results.filter(q => q.tags.includes(filterTag));
+    }
+    
+    switch(sortBy) {
+        case 'newest':
+            results.sort((a, b) => new Date(b.date) - new Date(a.date));
+            break;
+        case 'votes':
+            results.sort((a, b) => b.votes - a.votes);
+            break;
+        case 'answers':
+            results.sort((a, b) => b.answers - a.answers);
+            break;
+    }
+    
+    return results;
+}
+
+// Xử lý bình chọn câu hỏi
+function handleQuestionVote(questionId, voteType) {
+    const question = questions.find(q => q.id === questionId);
+    if (!question) return;
+    
+    if (voteType === 'up') {
+        question.votes += 1;
+    } else {
+        question.votes -= 1;
+    }
+    
+    renderQuestions();
+}
+
+// Cập nhật UI tìm kiếm
+function setupSearchUI() {
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Tìm kiếm câu hỏi...';
+    searchInput.className = 'px-4 py-2 border rounded-md w-full';
+    
+    const filterSelect = document.createElement('select');
+    filterSelect.className = 'px-4 py-2 border rounded-md';
+    filterSelect.innerHTML = `
+        <option value="">Tất cả thẻ</option>
+        ${[...new Set(questions.flatMap(q => q.tags))].map(tag => 
+            `<option value="${tag}">${tag}</option>`).join('')}
+    `;
+    
+    const sortSelect = document.createElement('select');
+    sortSelect.className = 'px-4 py-2 border rounded-md';
+    sortSelect.innerHTML = `
+        <option value="newest">Mới nhất</option>
+        <option value="votes">Bình chọn cao</option>
+        <option value="answers">Nhiều câu trả lời</option>
+    `;
+    
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'flex gap-2 mb-4';
+    searchContainer.append(searchInput, filterSelect, sortSelect);
+    
+    const mainContent = document.querySelector('.w-full.lg\\:w-2\\/4.order-1.lg\\:order-2');
+    if (mainContent) {
+        mainContent.insertBefore(searchContainer, mainContent.firstChild);
+    }
+    
+    searchInput.addEventListener('input', updateSearchResults);
+    filterSelect.addEventListener('change', updateSearchResults);
+    sortSelect.addEventListener('change', updateSearchResults);
+    
+    function updateSearchResults() {
+        const results = searchQuestions(
+            searchInput.value,
+            filterSelect.value,
+            sortSelect.value
+        );
+        
+        renderFilteredQuestions(results);
+    }
+}
+
+function renderFilteredQuestions(filteredQuestions) {
+    const questionList = document.getElementById('questionsList');
+    if (!questionList) return;
+    
+    questionList.innerHTML = filteredQuestions.map(question => `
+        <div class="border-b pb-4">
+            <div class="flex">
+                <div class="w-16 flex flex-col items-center text-center pr-4">
+                    <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="question" data-id="${question.id}" data-vote="up">
+                        <i class="fas fa-chevron-up text-xl"></i>
+                    </button>
+                    <span class="font-bold text-lg my-1">${question.votes}</span>
+                    <button class="text-gray-500 hover:text-blue-600 vote-btn" data-type="question" data-id="${question.id}" data-vote="down">
+                        <i class="fas fa-chevron-down text-xl"></i>
+                    </button>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold hover:text-blue-600 cursor-pointer">
+                        <a href="#" class="question-link" data-id="${question.id}">${question.title}</a>
+                    </h3>
+                    <div class="flex flex-wrap justify-between items-center">
+                        <div class="flex flex-wrap gap-2 mb-2">
+                            ${question.tags.map(tag => `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${tag}</span>`).join('')}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            <span>${question.date}</span>
+                            <span class="mx-1">•</span>
+                            <span>${question.answers} trả lời</span>
+                            <span class="mx-1">•</span>
+                            <span>${question.votes} bình chọn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Thêm vào DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    renderQuestions();
+    setupSearchUI();
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.vote-btn')) {
+            const btn = e.target.closest('.vote-btn');
+            if (btn.dataset.type === 'question') {
+                handleQuestionVote(parseInt(btn.dataset.id), btn.dataset.vote);
+            }
+        }
+    });
+});
+    </script>
+
+</body>
+</html>
